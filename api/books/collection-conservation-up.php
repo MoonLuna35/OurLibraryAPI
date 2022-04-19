@@ -23,7 +23,7 @@
      ||
      $request->data->collection->id < 0
      ||
-     !is_bool($request->data->collection->is_buyed)
+     !is_bool($request->data->collection->is_conserved)
     ) {
         header('HTTP/1.1 400 Bad Request');
         exit;
@@ -31,7 +31,7 @@
 
     $collection = new Collection(array(
         "id" => $request->data->collection->id,
-        "is_buyed" => $request->data->collection->is_conserved
+        "is_conserved" => $request->data->collection->is_conserved
     ));
 
     if($collectionDB->update_is_conserved($collection, $current_user)) {

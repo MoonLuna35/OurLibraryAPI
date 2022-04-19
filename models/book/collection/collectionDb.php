@@ -96,5 +96,40 @@
                 }   
             }
         }
+
+        public function update_is_conserved(Collection $c, User $u,int $h = 0): bool {
+            if ($h === MAX_TRY) {
+                header('HTTP 503 Service Unavailable');
+                exit;
+            }
+            try {
+                $this->_db->beginTransaction();
+                $query = $this->_db->prepare("
+                    UPDATE
+                        book_collection  
+                    SET
+                        is_conserved = :is_conserved   
+                    WHERE
+                        user = :user
+                    AND 
+                        id = :collection
+                ");
+                $query->execute(array(
+                    ":is_conserved" => $c->get_is_conserved() ? 1 : 0,
+                    ":user" => $u->get_id(),
+                    ":collection" => $c->get_id(),
+                ));
+
+                $this->_db->commit();
+                if ($query->rowCount() === 0) {
+                    return false;
+                }
+                return true;
+            }
+            catch(Exeption $e) {
+                $this->_db->rollBack();
+                $this->update_is_conserved($c, $u,$h+1); 
+            }
+        }
     } 
 ?>
